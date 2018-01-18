@@ -1,0 +1,10 @@
+/* Feedbacks view styles */
+.Feedback-Sider-Right {
+    box-shadow: inset 2px 0 12px 0 rgba(28, 46, 61, .1);
+}
+
+.Feedback-ratingStar {
+    margin-right: 6px;
+    color: rgb(242, 181, 54);
+    font-size: 16px !important;
+}

@@ -1,0 +1,122 @@
+.App-logo {
+  height: 60px;
+  vertical-align: top;
+}
+
+.App-header {
+    background: #4a90e2;
+    background: linear-gradient(90deg, #4a90e2, #3773ba);
+    overflow: hidden;
+    padding: 0 15px;
+    height: 60px;
+    line-height: 60px;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.App-body {
+    background-color: #fff !important;
+}
+
+.App-sideNav {
+    min-height: 100vh;
+    background-color: rgb(246, 246, 246);
+    padding: 24px 8px;
+}
+
+.App-searchTag {
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.App-checkedBackground {
+    background-image: url('checks.jpg');
+}
+
+/* Typography related styles */
+.App-textMeta {
+    color: rgb(150, 157, 164);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 400 !important;
+    color: rgb(57, 70, 82) !important;
+}
+
+
+/* Ant related style changes */
+.App-body .ant-form-item {
+    margin: 0 !important;
+}
+
+.App-body .has-error .ant-form-explain {
+    color: rgba(245, 34, 45, 0.5) !important;
+}
+
+.App-body .ant-form-item-control {
+    line-height: 1.5 !important;
+}
+
+.App-body .ant-tag {
+    background: #fff;
+    height: 32px;
+    line-height: 32px;
+    font-size: 13px;
+    padding: 0 10px;
+    color: rgb(150, 157, 164);
+    border-color: #ececec;
+}
+
+.App-body .ant-list-item-content,
+.App-body .ant-list-item-extra { 
+    color: rgb(136, 144, 151) !important;
+}
+
+.App-body .ant-list-item-extra {
+    font-size: 12px;
+}
+
+.App-sideNav .ant-menu-item {
+    background-color: transparent !important;
+}
+
+.App-sideNav .ant-menu-item > a {
+    font-size: 16px;
+    color: rgb(150, 157, 164);
+}
+
+.App-sideNav .ant-menu-item-selected > a,
+.App-sideNav .ant-menu-item-selected > a:hover,
+.App-sideNav .ant-menu-item > a:hover {
+    color: #1890ff;
+}
+
+.App-userActions .ant-select-selection {
+    background-color: transparent !important;
+    border: 0 !important;
+}
+.App-userActions .ant-select-arrow {
+    color: #fff !important;
+}
+
+.noborder {
+    border: none !important;
+    outline: none !important;
+    padding: 0;
+    box-shadow: none !important;
+}
+
+.noborder:hover {
+    border-color: transparent !important;
+}
+
+.noborder:focus {
+    outline: none !important;
+    border: none !important;
+    border-color: transparent !important;
+}

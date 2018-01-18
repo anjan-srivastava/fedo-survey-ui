@@ -1,0 +1,46 @@
+.CreateCampaign-Footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    background: #fff !important;
+    border-top: solid 1px #e3e5e6;
+    padding: 12px 24px !important;
+}
+
+.CreateCampaign-mailPreview {
+    background: #fff;
+    border: solid 1px #e3e5e6;
+    border-radius: 2px;
+    width: 90%;
+    box-shadow: 0 0 12px 0 rgba(28, 46, 61, .5);
+    margin: 24px 0;
+}
+
+.CreateCampaign-mailPreview .section {
+    padding: 18px;
+}
+
+.CreateCampaign-mailPreview .mediumFont {
+    font-size: 16px;
+}
+
+.CreateCampaign-Section {
+    border-bottom: solid 1px #e3e5e6;
+    padding: 36px 24px;
+}
+
+.CreateCampaign-mailPreview .section.signature {
+    min-height: 100px;
+}
+
+.CreateCampaign-mediumEditor.medium-editor-placeholder:after,
+.CreateCampaign-mediumEditor .medium-editor-placeholder:after,
+.CreateCampaign-mediumEditor:after {
+    font-style: normal !important;
+    white-space: pre-wrap !important;
+    color: #c2c2c2 !important;
+}
+
+.CreateCampaign-mediumEditor p {
+    margin-bottom: 2px !important;
+}

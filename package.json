@@ -1,0 +1,30 @@
+{
+  "name": "rapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.0.0",
+    "babel-polyfill": "^6.26.0",
+    "dateformat": "^3.0.2",
+    "draft-css": "0.0.1",
+    "draft-js": "^0.10.4",
+    "fetch-intercept": "^2.2.3",
+    "font-awesome": "^4.7.0",
+    "medium-editor": "^5.23.2",
+    "react-dom": "^16.1.0",
+    "react-medium-editor": "^1.8.1",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.0.17"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:3000",
+  "devDependencies": {
+    "classnames": "^2.2.5",
+    "react": "^16.1.0"
+  }
+}
