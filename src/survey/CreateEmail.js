@@ -97,20 +97,33 @@ class Content extends Component {
                 .then(function(data) {
                     const saveOnly = document.getElementById('id_formCreateCampaignSubmit').getAttribute('data-saveonly');
                     if (saveOnly) {
-                        if (window.confirm("Saved Successfully. Do you want to continue editing?")) {
-                            // do nothing stay on email template page
-                        } else {
-                            window.location.href='/';
-                        }
+                        Modal.confirm({
+                            title: 'Continue editing?',
+                            content: 'Successfully saved your work, Do you want to continue editing?',
+                            okText: "No, I'm done",
+                            cancelText: 'Yes',
+                            onOk: function() { window.location.href='/'; },
+                            onCancel: function () { }
+                        });
                     } else {
-                        alert("Sent successfully, redirecting you to campaign list.");
-                        window.location.href='/';
+                        Modal.success({
+                            title: 'Success',
+                            content: 'Successfully sent campaign mail(s), redirecting you to user review list.',
+                            okText: 'Ok',
+                            onOk: function() { window.location.href='/'; },
+                            onCancel: function() { window.location.href='/'; }
+                        });
                     }
                 }).then(function() { 
                     document.getElementById('id_formCreateCampaignSubmit').removeAttribute('data-saveonly');
                 }).catch(function(err) {
-                    alert("Something went wrong, please retry. Redirecting you to campaign list.");
-                    window.location.href='/';
+                    Modal.error({
+                        title: 'Error',
+                        content: 'Something went wrong, please retry again. Redirecting you to user review list.',
+                        okText: 'Ok',
+                        onOk: function() { window.location.href= '/'; },
+                        onCancel: function() { window.location.href='/'; }
+                    });
                 })
             }
         }).bind(this));

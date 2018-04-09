@@ -97,11 +97,38 @@
     color: #D8D8D8;
 }
 
-.DesignSettings input[type="text"]{
+.DesignSettings input[type="text"],
+.Settings input[type="text"] {
     width: 99px;
     height: 30px;
     border: 1px solid #E6E6E6;
     border-radius: 4px;
+    color: #1C2E3D;
+    font-size: 14px;
+    line-height: 16px;
+}
+
+
+/******* Profile Settings Styles ********/
+
+.Profile-profileForm {
+    padding: 30px 0;
+}
+
+.WidgetSettings .Profile-profileForm div.ant-form-item {
+    margin: 0 !important;
+}
+
+.WidgetSettings .Profile-profileForm div.ant-form-item:last-child {
+    padding-bottom: 30px;
+}
+
+.Profile-profileForm input[type='text'],
+.Profile-profileForm textarea {
+    width: 400px;
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    background-color: #FFFFFF;
     color: #1C2E3D;
     font-size: 14px;
     line-height: 16px;

@@ -219,6 +219,23 @@ class DesignForm extends Component {
                         <Input />
                     )}
                 </Form.Item>
+                
+                
+                <Form.Item {...formItemLayout} label="Title font color" id='design_titleFontColor'>
+                    { getFieldDecorator('design_titleFontColor', { initialValue: this.props.parentState.config.design.titleFontColor, 
+                                                   rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
+                        <Input />
+                    )}
+                </Form.Item>
+                
+                <Form.Item {...formItemLayout} label="Reviewer name font color" id='design_nameFontColor'>
+                    { getFieldDecorator('design_nameFontColor', { initialValue: this.props.parentState.config.design.nameFontColor, 
+                                                   rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
+                        <Input />
+                    )}
+                </Form.Item>
+
+
                 <Form.Item {...formItemLayout} label="Font color" id='design_fontColor'>
                     { getFieldDecorator('design_fontColor', { initialValue: this.props.parentState.config.design.fontColor, 
                                                    rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(

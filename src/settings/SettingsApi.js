@@ -46,6 +46,31 @@ class SettingsApi {
             }
         }).then((res) => res.json());
     }
+
+
+    static getProfileSettings() {
+        return fetch('/api/settings/profile', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());
+    }
+    
+    static saveProfileSettings(spec) {
+        return fetch('/api/settings/profile', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(spec)
+        }).then((res) => res.json());
+    }
+
 }
 
 export default SettingsApi;
