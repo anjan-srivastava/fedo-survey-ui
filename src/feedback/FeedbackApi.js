@@ -27,6 +27,28 @@ class FeedbackApi {
    }
 
 
+   static publish (fkey) {
+        return fetch('/api/feedbacks/'+fkey+'/publish', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());     
+   }
+   
+   static unpublish (fkey) {
+        return fetch('/api/feedbacks/'+fkey+'/unpublish', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());     
+   }
+
 }
 
 export default FeedbackApi;

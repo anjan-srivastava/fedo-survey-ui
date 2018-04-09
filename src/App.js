@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { CreateCampaignView, ListSurvey } from './survey';
+import SettingsView from './settings';
 import UserApi from './user';
 import FeedbacksView from './feedback';
 import { HashRouter, Route, Switch, Link } from 'react-router-dom';
@@ -16,11 +17,11 @@ class App extends Component {
   state = { me: {} }
   constructor() {
     super();
-    const unregister = fetchIntercept.register({
+    fetchIntercept.register({
         response: function(response) {
             if (response.redirected) {
                 window.location = response.url;
-                //window.location = 'http://localhost:3000/login';
+                // window.location = 'http://localhost:3000/login';
             }
             return response;
         }
@@ -44,21 +45,23 @@ class App extends Component {
                     <UserActions user={this.state.me} className="pull-right App-userActions" style={{width: 128, marginTop: 15, color: '#fff'}}/>
                 </Layout.Header>
                 <Layout>
-                    <Layout.Sider width={ 165 } >
+                    <Layout.Sider width={ 165 } style={{backgroundColor: 'rgb(246, 246, 246)'}}>
                         <Affix>
-                            <Menu className = "App-sideNav" defaultSelectedKeys= { ["surveys"] } >
-                                <Menu.Item key="feedbacks"><Link to="/feedbacks">User feedbacks</Link></Menu.Item>
+                            <Menu className = "App-sideNav" defaultSelectedKeys= { ["feedbacks"] } >
+                                <Menu.Item key="feedbacks"><Link to="/feedbacks">User Reviews</Link></Menu.Item>
                                 <Menu.Item key="surveys"><Link to="/surveys">Campaigns</Link></Menu.Item>
+                                <Menu.Item key="settings"><Link to="/settings">Settings</Link></Menu.Item>
                             </Menu>
                         </Affix>         
                     </Layout.Sider>
                     <Layout.Content className="App-body" >
                         <Switch>
-                            <Route exact path="/" component={ ListSurvey } />
+                            <Route exact path="/" component={ FeedbacksView } />
                             <Route exact path="/feedbacks" component={ FeedbacksView } />
                             <Route exact path="/surveys" component={ ListSurvey } />
                             <Route exact path="/surveys/new" component={ CreateCampaignView } />
                             <Route exact path="/surveys/:surveyKey/edit" component={ CreateCampaignView } />
+                            <Route exact path="/settings" component={ SettingsView } />
                         </Switch>
                     </Layout.Content>
                 </Layout>
@@ -87,7 +90,7 @@ var WorkspaceActions = (props) => {
         </Select>
         **/
 
-        <span {...props }> { props.user.company }</span>
+        <span {...props }> { } </span>
     ); 
 };
 

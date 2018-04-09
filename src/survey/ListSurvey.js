@@ -64,10 +64,10 @@ class ListSurvey extends Component {
 var SurveyHeader = (props) => {
     return (
         <Row type="flex" justify="space-between" style={{ padding: '32px', border: 'solid 1px #ececec' }}>
-            <Col span={15}>
-                <h2>Campaigns</h2>
-                <div>Recent Campaigns.</div>
-                <div>{ props.count } / { props.total }</div>
+            <Col span={18}>
+                <h2>Email Campaigns</h2>
+                <div className="App-textMeta">You can set new email campaign from here. Send mails to specific users or in masses. All the user replies to these emails can be accessed in the Reviews section.</div>
+                <div className="App-textMeta">{ props.count } / { props.total } {'Campaigns'} </div>
             </Col>
             <Col span={5}>
                 <Link to="/surveys/new"><Button type="primary" ghost = {true} className="pull-right">Create Campaign</Button></Link>
@@ -78,7 +78,7 @@ var SurveyHeader = (props) => {
 
 var SurveyEntry = (props) => {
     var surveyData = props.data;
-    surveyData.description = "A Campaign about A FeatureA Campaign about A FeatureA Campaign about A FeatureA Campaign about A FeatureA Campaign about A Feature";
+    surveyData.description = "Need some campaign description";
     return (
         <List.Item> 
             <List.Item.Meta title={ <Link to={ "/surveys/" + surveyData.surveyKey + '/edit'} style={{color:'#1890ff'}}>{ surveyData.title } </Link> } />

@@ -4,7 +4,21 @@
 }
 
 .Feedback-ratingStar {
-    margin-right: 6px;
+    margin-right: 5px;
     color: rgb(242, 181, 54);
     font-size: 16px !important;
+}
+
+.Feedback-Review-Published {
+    background-color: rgba(203, 230, 207, 0.2);
+}
+
+.Feedback-displayed {
+    color: #56C756;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 14px;
+}
+
+.Feedback-contentText {
 }

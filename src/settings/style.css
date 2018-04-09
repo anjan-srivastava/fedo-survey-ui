@@ -1,0 +1,108 @@
+.WidgetSettings section {
+    margin: 24px 0;
+}
+.WidgetSettings section h3 {
+    margin: 0 0 20px 0;
+    font-weight: 500 !important;
+    font-size: 18px;
+    line-height: 24px;
+    color: rgba(28,46,61,0.8) !important;
+}
+
+.WidgetSettings .ant-tabs-tab {
+    color: rgba(28,46,61,0.5);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
+} 
+
+.WidgetSettings .ant-tabs-tab-active,
+.WidgetSettings .ant-tabs-tab:hover {
+    color: #1C2E3D !important;
+}
+
+.WidgetSettings .ant-tabs-nav {
+    padding: 5px 30px;
+}
+
+.WidgetSettings .ant-tabs-ink-bar {
+    height: 4px;
+    border-radius: 4px 4px 0 0;
+    background-color: #1C2E3D !important;
+}
+
+.WidgetSettings div.ant-form-item {
+    background-color: rgba(28,46,61,0.05);
+    padding: 13px 20px;
+    color: #1C2E3D;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+    margin: 1px 0 !important;
+}
+
+.WidgetSettings .ant-form-item:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.WidgetSettings .ant-form-item:last-child {
+    border-radius: 0 0 4px 4px;
+ }
+
+.WidgetSettings .ant-form-item .ant-form-item-label {
+    text-align: left;
+}
+
+.WidgetSettings .ant-form-item label:after {
+    display: none;
+}
+
+.WidgetSettings .ant-radio-inner {
+    width: 20px;
+    height: 20px;
+    border-color: #d7d7d7 !important;
+}
+
+.WidgetSettings .ant-radio-checked .ant-radio-inner:after {
+    top: 5px;
+    left: 5px;
+}
+
+.WidgetSettings .ant-radio+span {
+    color: #1C2E3D;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: normal;
+}
+
+.WidgetSettings .ant-switch {
+    background-color: #D8D8D8;
+}
+
+.WidgetSettings .ant-switch-checked {
+    background-color: #2BD321;
+}
+
+.WidgetSettings .switch-off,
+.WidgetSettings .switch-on {
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 14px;
+}
+.WidgetSettings .switch-on {
+    color: #2BD321;
+}
+.WidgetSettings .switch-off {
+    color: #D8D8D8;
+}
+
+.DesignSettings input[type="text"]{
+    width: 99px;
+    height: 30px;
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    color: #1C2E3D;
+    font-size: 14px;
+    line-height: 16px;
+}
