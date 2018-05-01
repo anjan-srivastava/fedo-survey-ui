@@ -315,7 +315,7 @@ var Rating = (props) => {
     var ratingStars = [];
     for(var i=0; i < props.rating; i+=1) ratingStars.push(<i key={(new Date()).getTime() + "_star_"+i} className="fa fa-star Feedback-ratingStar" />);
     return (
-        <span style={{marginLeft: 15}}>
+        <span style={{marginLeft: 5}}>
             { ratingStars }
         </span>        
     );

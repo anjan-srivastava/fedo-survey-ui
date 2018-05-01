@@ -34,9 +34,9 @@
 
 .Feedback-name-edit {
     color: #4A90E2;
-    margin-left: 8px;
+    margin-left: 4px;
     cursor: pointer;
-    display: none !important;
+    visibility: hidden;
 }
 .Feedback-name-editbox {
     width: 99px;
@@ -50,7 +50,7 @@
 
 .ant-list-item:hover
 .Feedback-name-edit {
-    display: inline-block !important;
+    visibility: visible ;
 }
 
 .Feedback-contentText {
