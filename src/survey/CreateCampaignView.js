@@ -128,7 +128,7 @@ class AddRecepientContent extends Component {
             const initialRecepients = this.props.recepients;
 
             const csvEmailColumns = [{ title: 'Email', dataIndex: 'email', key: 'email' }];
-            const sampleEmails = [ { key: '1', email: 'admin@fedo.com'}, { key: '2', email: 'support@fedo.com'} ];
+            const sampleEmails = [ { key: '1', email: 'support@outreech.io'}, { key: '2', email: 'admin@outreech.io'} ];
             return (
                 <Row style={{padding: 24}}>
                     <Form id="id_recepientsForm" onSubmit={ this.handleSubmit.bind(this) }>

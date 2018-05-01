@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
-import { Spin, Layout, List, Row, Col, Affix, Tabs, Button, Tag, Select, Pagination, Input, notification } from 'antd';
+import { Spin, Layout, List, Row, Col, Affix, Tabs, Button, Tag, Select, Pagination, Input, 
+    Modal, Alert, Icon, notification, message } from 'antd';
 import dateformat from 'dateformat';
+
 import FeedbackApi from './FeedbackApi.js';
+import SettingsApi from '../settings/SettingsApi.js';
+import myintro from '../myintro.js';
 
 import './style.css';
 
@@ -13,11 +17,11 @@ class FeedbacksView extends Component {
               filterFetching: false
             }
     componentDidMount() {
-        this.paginate(1);
+        this.paginate(1).then(() => myintro("/surveys"));
     }
 
     paginate(page, pageSize) {
-        FeedbackApi.list(this.query, page).then((function(data) {
+        return FeedbackApi.list(this.query, page).then((function(data) {
             this.setState(Object.assign({}, this.state, {feedbacks: data}));
         }).bind(this));
     
@@ -49,18 +53,34 @@ class FeedbacksView extends Component {
         this.setState(Object.assign({}, this.state, {feedbacks: updatedFeedbacks}));
     }
 
+    showSnippetModal() {
+        SettingsApi.getWidgetLink()
+            .then((data) => {
+                this.setState(Object.assign({}, this.state, {snippetModalVisible: true, widgetUrl: data.url}));
+            });
+    }
+
+    closeSnippetModal() {
+        this.setState(Object.assign({}, this.state, {snippetModalVisible: false}));
+    }
+
     render() {
         var feedbackItems = this.state.feedbacks.docs.map(((f, idx)=>{
             var that = this, handler = (function(idx) {
                 return (newFeedback) => that.handleFeedbackUpdate(newFeedback, idx);
             }(idx));
 
-            return <FeedbackItem data={f} key={f.feedbackKey} onUpdate={ handler } />;
+            if (idx === 0) {
+                return <FeedbackItem data={f} key={f.feedbackKey} onUpdate={ handler } 
+                    data-step = "2" data-intro="All the reviews that users enter from your email campaign will be shown here. You can publish or un-publish a review on your web page to start displaying it." showSnippetModal = { this.showSnippetModal.bind(this) }/>;
+            }
+
+            return <FeedbackItem data={f} key={f.feedbackKey} onUpdate={ handler } showSnippetModal = { this.showSnippetModal.bind(this) }/>;
         }).bind(this));
 
         const { total,page, limit,docs } = this.state.feedbacks;
         return (
-            <Layout>
+            <Layout className="Feedback-extra-nomargin">
                 <Layout.Content style={{background: '#fff'}}>
                     <PageHeader count={ (page-1)*limit + docs.length } total={ total }
                         filterValue = { this.state.filterValue }
@@ -82,6 +102,8 @@ class FeedbacksView extends Component {
                         </div>
                     </Affix>
                 </Layout.Sider>
+
+                <CodeSnippetModal widgetUrl={this.state.widgetUrl} visible = {this.state.snippetModalVisible} close={ this.closeSnippetModal.bind(this) }/>
             </Layout>
          );
     }
@@ -139,56 +161,155 @@ var PageHeader = (props) => {
     );
 };
 
-var FeedbackItem = (props) => {
-    var feedback = props.data;
-    var publishBtn,
-        handlePublish = function(isPublished) {
-            var fn;
-            if (isPublished) fn = FeedbackApi.unpublish;
-            else fn = FeedbackApi.publish;
-
-            fn(feedback.feedbackKey)
-            .then(function(res) {
-                var title, fn;
-                if (res.success) { 
-                    title = "Success";
-                    fn = notification.success;
-                    // update model
-                    if (isPublished) feedback.isPublished = false;
-                    else feedback.isPublished = true;
-                    
-                    props.onUpdate(feedback);
-                } else {
-                    title = "Error";
-                    fn = notification.error;
-                }
-
-                fn({
-                    message: title,
-                    description: res.msg
-                });
-            });
-    };
-
-    let itemPublishedClass = "",
-        displayedStyle = { display: 'none' };
-    if (feedback.isPublished) {
-        publishBtn = (<Button className="fedoBtn faded" type="primary" size="small" onClick={ () => handlePublish(true) }>Stop showing on website</Button>);
-        itemPublishedClass = "Feedback-Review-Published";
-        displayedStyle = { display: 'inline', marginLeft: 15};
-    } else {
-        publishBtn = (<Button className="fedoBtn" type="primary" size="small" onClick={ () => handlePublish(false) }>Display on website</Button>);
+class FeedbackItem extends Component {
+    editedName = this.props.data.name
+    state = { editReviewer: false }
+    toggleEditBox() {
+        this.setState(Object.assign({}, this.state, {editReviewer: !this.state.editReviewer}));
     }
 
-    return (
-        <List.Item style={{padding: 24}} className={ itemPublishedClass } extra={ <div style={{ position: 'relative', width: 160, height: '100%', textAlign: 'right', paddingRight: 10}}> 
-            <div style={{position: 'absolute', bottom: 0, right: 10 }}>{ dateformat(feedback.updated, 'mmm d, yyyy') } </div> { publishBtn } </div> }
-                actions = { [<FeedbackItemMeta tags={feedback.tags} updateTimestamp={feedback.updated}/>] } >
-            <List.Item.Meta title={ <div><span>{ feedback.emailId }</span><Rating rating={feedback.rating} /><span style={ displayedStyle } className={'Feedback-displayed'}>( DISPLAYED )</span></div> } />
-                <span className='Feedback-contentText'>{ feedback.feedbacktext }</span>
-        </List.Item>      
-    );
-};
+    saveReviewerName() {
+        if (!(/^[a-z][a-z0-9\s]*$/i).test(this.editedName)) {
+            Modal.error({title: 'Invalid Reviewer Name', content: 'Name can only contain alphanumeric letters.'});
+            return;
+        }
+
+        FeedbackApi.updateReviewerName(this.props.data.feedbackKey, this.editedName)
+        .then(((resp) => {
+            let feedback = this.props.data,
+                fn, title;
+            
+            if (resp.success) {
+                fn = notification.success;
+                title = 'Success';
+            } else {
+                fn = notification.error;
+                title: 'Error';
+            }
+
+            fn({
+                message: title,
+                description: resp.msg
+            });
+
+            feedback.name = this.editedName;
+            this.toggleEditBox();
+            this.props.onUpdate(feedback);
+        }).bind(this));
+    }
+
+    render() {
+        var feedback = this.props.data;
+        var publishBtn,
+            handlePublish = (function(isPublished) {
+                let fn,
+                    widgetCount = () => {
+                        const meJson = document.getElementsByClassName('App')[0].getAttribute('data-me'),
+                            me = JSON.parse(meJson);
+                        return me.license.widgetCount;
+                    };
+
+                if (isPublished) { 
+                    fn = FeedbackApi.unpublish;
+                } else if (!widgetCount()) {
+                    fn = (feedbackKey) => {
+                        let resolve = () => { },
+                        reject = () => { };
+
+                        this.props.showSnippetModal();                    
+                        return new Promise(resolve, reject);
+                    }
+                } else {
+                    fn = FeedbackApi.publish;
+                }
+
+                fn(feedback.feedbackKey)
+                .then((function(res) {
+                    var title, fn;
+                    if (res.success) { 
+                        title = "Success";
+                        fn = notification.success;
+                        // update model
+                        if (isPublished) feedback.isPublished = false;
+                        else feedback.isPublished = true;
+                        
+                        this.props.onUpdate(feedback);
+                    } else {
+                        title = "Error";
+                        fn = notification.error;
+                    }
+
+                    fn({
+                        message: title,
+                        description: res.msg
+                    });
+                }).bind(this));
+        }).bind(this);
+
+        let itemPublishedClass = "",
+            displayedStyle = { display: 'none' },
+            sampleStyle = { display: 'none'};
+        if (feedback.isPublished) {
+            publishBtn = (<Button className="fedoBtn faded" type="primary" size="small" onClick={ () => handlePublish(true) }>Stop showing on website</Button>);
+            itemPublishedClass = "Feedback-Review-Published";
+            displayedStyle = { display: 'inline', marginLeft: 15};
+        } else {
+            publishBtn = (<Button className="fedoBtn" type="primary" size="small" onClick={ () => handlePublish(false) }>Display on website</Button>);
+        }
+
+        if (feedback.sample) sampleStyle = { display: 'inline', marginLeft: 15};
+        return (
+            <List.Item {...this.props} style={{padding: 24, position: 'relative'}} className={ itemPublishedClass } 
+                extra = 
+                  {(<div style={{ textAlign: 'right' }} >
+                        <div style={{position: 'absolute', bottom: 12, right: 24 }}>
+                            <span> <i className='fa fa-envelope' /> &nbsp; { `Reviewed by: ${ feedback.emailId }` } </span>
+                            <span style={{margin: '0 15px'}}> | </span>
+                            <span >{ dateformat(feedback.updated, 'mmm d, yyyy') } </span>
+                        </div> 
+                    </div>
+                  )}
+
+                actions = { [<FeedbackItemMeta tags={feedback.tags} updateTimestamp={feedback.updated}/>] } 
+                >
+
+                <List.Item.Meta title={ 
+                    <div>
+                        <span className='Feedback-edit-wrap' style={{display: this.state.editReviewer? 'inline': 'none' }}>
+                            <Input type='text' 
+                                defaultValue = {feedback.name}
+                                onChange = { ((e)=> { this.editedName = e.target.value }).bind(this) } 
+                                suffix = { <Button style={{width: 24, height: 24, padding: 0}} type='primary' size='small'
+                                    onClick = { this.saveReviewerName.bind(this) }><Icon type='check' /></Button>}
+                                style = {{
+                                    width: 294,
+                                    height: 30,
+                                    borderRadius: 4,
+                                    color: 'rgb(136, 144, 151)',
+                                    fontSize: '14px',
+                                    lineHeight: '16px'
+                                }}
+                            />
+                            <Icon type='close' 
+                                style={{cursor: 'pointer', marginLeft: 20, color: '#aaa'}} 
+                                onClick = { this.toggleEditBox.bind(this) }/>
+                        </span>
+                        <span style={{ display: this.state.editReviewer? 'none': 'inline'}}>
+                            <span style={{textTransform: 'capitalize'}}>{ feedback.name }</span>
+                            <i className="fa fa-pencil Feedback-name-edit" title="Click to edit reviewer's name"
+                                onClick = { this.toggleEditBox.bind(this) }/>
+                            <Rating rating={feedback.rating} />
+                            <span style={sampleStyle} className={'Feedback-displayed'}>( SAMPLE REVIEW )</span>
+                            <span style={ displayedStyle } className={'Feedback-displayed'}>( DISPLAYED )</span>
+                        </span>
+                        <span style={{float: 'right'}}>{ publishBtn }</span>
+                    </div> 
+                } />
+                    <span className='Feedback-contentText'>{ feedback.feedbacktext }</span>
+            </List.Item>      
+        );
+    }
+}
 
 var Rating = (props) => {
     var ratingStars = [];
@@ -218,6 +339,41 @@ var Stars = (props) => {
     }
 
     return (<span>{ stars } </span>)
+}
+
+var CodeSnippetModal = (props) => {
+    let copyToClipBoard = (e) => {
+        var elem = e.target;
+        snippetCopy(elem);
+    },
+
+    snippetCopy = (elem) => {
+        try {
+            elem.select();
+            document.execCommand('copy');
+            message.info('Copied to clipboard');
+        } catch (e) { /*ignore*/ }
+    };
+
+    return (
+        <Modal
+            title="Missing Code Snippet"
+            visible={ props.visible }
+            okText= { "Done" }
+            width = { 700 }
+            onOk = { props.close }
+            onCancel = { props.close } >
+            <div className='App-textMeta'> { "Looks like you have not pasted the widget code snippet on your website. Copy and paste this code below just before the </head> tag of your page. Make sure you paste the code on every page where you want the widget to be displayed" } </div>
+            <code>
+                <Input.TextArea key={(new Date()).getTime()} size='large' readOnly={true} style={{fontSize: 13, padding: '10px', resize: 'none', margin: '10px 0'}} rows={2} onClick={copyToClipBoard} id="snippetBoxPopup">
+                {
+                    "<script async type='text/javascript' src='" + props.widgetUrl +"'></script>"
+                }
+                </Input.TextArea>
+                <Button type="primary" ghost onClick = { ()=> snippetCopy( document.getElementById('snippetBoxPopup') ) }>Copy</Button>
+            </code>
+        </Modal>
+    );
 }
 export default FeedbacksView;
 

@@ -74,57 +74,94 @@ class Content extends Component {
     
     handleFormSubmission(e) {
         e.preventDefault();
-        const surveyKey = this.props.surveyKey;
+        let surveyKey = this.props.surveyKey;
+
         const saveOrEditApi = surveyKey ? SurveyApi.editSurvey: SurveyApi.sendSurvey;
     
-        console.log("SurveyKey: ", surveyKey);
+        console.log("SurveyKey: ", surveyKey, this.props.router);
 
         this.props.form.validateFieldsAndScroll(((err, values) => {
             if (!err) {
                 const formData = this.props.form.getFieldsValue();
-                saveOrEditApi({
-                    recepients: this.props.recepients,
-                    title: formData.id_campaignName,
-                    subject: formData.id_emailSubject,
-                    tags: formData.id_campaignLabel,
-                    mailBody: formData.id_emailBody,
-                    cta: formData.id_emailCTA || 'Send us your feedback',
-                    signature: formData.id_emailSign,
-                    saveOnly: document.getElementById('id_formCreateCampaignSubmit').getAttribute('data-saveonly')
-                }, surveyKey)
-                .then((resp) => { if( resp.ok) return resp; throw new Error(resp.statusText)})
-                .then((resp) => { return resp.json(); })
-                .then(function(data) {
-                    const saveOnly = document.getElementById('id_formCreateCampaignSubmit').getAttribute('data-saveonly');
-                    if (saveOnly) {
-                        Modal.confirm({
-                            title: 'Continue editing?',
-                            content: 'Successfully saved your work, Do you want to continue editing?',
-                            okText: "No, I'm done",
-                            cancelText: 'Yes',
-                            onOk: function() { window.location.href='/'; },
-                            onCancel: function () { }
+                const saveOnly = document.getElementById('id_formCreateCampaignSubmit').getAttribute('data-saveonly');
+
+                var apiCall = function() {
+                    saveOrEditApi({
+                        recepients: this.props.recepients,
+                        title: formData.id_campaignName,
+                        subject: formData.id_emailSubject,
+                        tags: formData.id_campaignLabel,
+                        mailBody: formData.id_emailBody,
+                        cta: formData.id_emailCTA || 'Send us your feedback',
+                        signature: formData.id_emailSign,
+                        description: formData.id_campaignDesc,
+                        saveOnly: saveOnly
+
+                    }, surveyKey)
+                    .then((resp) => { if( resp.ok) return resp; throw { status: resp.status, msg: resp.text() }})
+                    .then((resp) => { return resp.json(); })
+                    .then(function(data) {
+                        const saveOnly = document.getElementById('id_formCreateCampaignSubmit').getAttribute('data-saveonly');
+                        const saveBtn = document.getElementById('id_formCreateCampaignSubmit');
+                        if (saveOnly) {
+                            !surveyKey && Modal.success({
+                                title: 'Your campaign has been saved successfully',
+                                content: 'Taking you to campaigns page.',
+                                okText: "Ok",
+                                onOk: function() { 
+                                    window.location.href='#/surveys'; 
+                                },
+                            });
+                            
+                            surveyKey && Modal.confirm({
+                                title: 'Your work has been saved',
+                                content: 'Do you want to continue editing? ',
+                                okText: "No, I'm done",
+                                cancelText: "Yes",
+                                onOk: function() { 
+                                    window.location.href='#/surveys'; 
+                                },
+                                onCancel: function() {}
+                            });
+
+                        } else {
+                            Modal.success({
+                                title: 'Your emails have been sent',
+                                content: 'Taking you to reviews page.',
+                                okText: 'Ok',
+                                onOk: function() { window.location.href='#/feedbacks'; },
+                                onCancel: function() { window.location.href='#/feedbacks'; }
+                            });
+                        }
+                    }).then(function() { 
+                        document.getElementById('id_formCreateCampaignSubmit').removeAttribute('data-saveonly');
+                    }).catch(function(err) {
+                        err.msg.then((text) => {
+                            if (err.status == 500) text = "Something went wrong, please try again.";
+                            Modal.error({
+                                title: 'Error while trying to send emails',
+                                content: text,
+                                okText: 'Ok',
+                                onOk: function() { window.location.href= '#/feedbacks'; },
+                                onCancel: function() { window.location.href='#/feedbacks'; }
+                            });
                         });
-                    } else {
-                        Modal.success({
-                            title: 'Success',
-                            content: 'Successfully sent campaign mail(s), redirecting you to user review list.',
-                            okText: 'Ok',
-                            onOk: function() { window.location.href='/'; },
-                            onCancel: function() { window.location.href='/'; }
-                        });
-                    }
-                }).then(function() { 
-                    document.getElementById('id_formCreateCampaignSubmit').removeAttribute('data-saveonly');
-                }).catch(function(err) {
-                    Modal.error({
-                        title: 'Error',
-                        content: 'Something went wrong, please retry again. Redirecting you to user review list.',
-                        okText: 'Ok',
-                        onOk: function() { window.location.href= '/'; },
-                        onCancel: function() { window.location.href='/'; }
                     });
-                })
+
+                }.bind(this); // apiCall declaration ends here
+
+                if (!saveOnly) {
+                    Modal.confirm({
+                        title: 'Are you sure to send this campaign?',
+                        content: 'This operation would send mails to end users.',
+                        okText: 'Yes, Sure',
+                        cancelText: 'No, wait',
+                        onOk: function () { apiCall(); },
+                        onCancel: function () { }
+                    });
+                } else {
+                    apiCall();
+                }
             }
         }).bind(this));
     }
@@ -139,7 +176,7 @@ class Content extends Component {
     
     render() {
         const { getFieldDecorator } = this.props.form;
-        let { title, tags, subject, mailBody, cta, signature } = this.props.survey;
+        let { title, tags, subject, mailBody, cta, signature, description } = this.props.survey;
         subject = subject ? subject: this.defaultSubject;
         mailBody = mailBody ? mailBody: this.defaultMailBody;
         return (
@@ -155,6 +192,15 @@ class Content extends Component {
                                         ) }
                             </Form.Item>
                         </Row>
+                        <Row className="CreateCampaign-Section">
+                            <Form.Item>
+                                <h3 id="id_campaignDesc">Description of this email campaign</h3>
+                                { getFieldDecorator('id_campaignDesc', { initialValue: description })(
+                                        <Input className="noborder" placeholder="Describe this campaign a bit" />
+                                        ) }
+                            </Form.Item>
+                        </Row>
+
                         <Row className="CreateCampaign-Section">
                             <Form.Item>
                                 <h3 id="id_campaignLabel">Add a Label</h3>
@@ -212,7 +258,7 @@ class Content extends Component {
                             </Radio.Group>
                         </Col>
                         <Col span={8}>
-                            <Button style={{color: '#aaa', fontSize: 12}} className="pull-right">Copy HTML</Button>
+                        {/* <Button style={{color: '#aaa', fontSize: 12}} className="pull-right">Copy HTML</Button> */}
                         </Col>
                     </Row>
 
@@ -300,6 +346,9 @@ class Footer extends Component {
 
     saveSurvey() {
         const campaignFormSubmitButton = document.getElementById('id_formCreateCampaignSubmit');
+        const requestInProg = campaignFormSubmitButton.hasAttribute('data-saveonly');
+        if (requestInProg) return; // save request already in process
+
         campaignFormSubmitButton.setAttribute('data-saveonly', 'true');
         campaignFormSubmitButton.click(); 
     }
@@ -334,14 +383,21 @@ class Footer extends Component {
                     tags: formData.id_campaignLabel,
                     mailBody: formData.id_emailBody,
                     cta: formData.id_emailCTA || 'Send us your feedback',
-                    signature: formData.id_emailSign                
+                    signature: formData.id_emailSign,
+                    description: formData.id_campaignDesc                
                 })
                 .then((resp) => {
-                    if (resp.ok) return resp; throw new Error(resp.statusText);
+                    if (resp.ok) return resp; console.log(resp); throw { status: resp.status, msg: resp.text() };
                 })
                 .then((resp) => resp.json())
                 .then(((data) => this.notify('success', 'Send Test', 'Last operation was successful. Make sure you have used correct email id.')).bind(this))
-                .catch(((err) => this.notify('error', 'Send Test', 'Something went wrong while sending mail. Please try again.')).bind(this));
+                .catch(((err) =>  { 
+                    const that = this; 
+                    err.msg.then((text) =>  { 
+                        if (err.status == 500) text='Something went wrong, please try again.';
+                        that.notify('error', 'Send Test', text) 
+                        }) 
+                }).bind(this));
 
 
                 this.closeModal();

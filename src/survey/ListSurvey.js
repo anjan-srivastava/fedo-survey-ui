@@ -4,6 +4,8 @@ import dateformat from 'dateformat';
 import { Layout, List, Button, Pagination, Row, Col, Tabs, Affix } from 'antd';
 import SurveyApi from './SurveyApi.js';
 
+import myintro from '../myintro.js';
+
 // styles
 import './ListSurvey.css';
 
@@ -16,19 +18,24 @@ class ListSurvey extends Component {
     }
 
     componentDidMount() {
-        this.paginate(1, 10);
+        this.paginate(1, 10).then(myintro);
     }
 
     paginate(page, pageSize) {
-        SurveyApi.list(page).then((function(data) {
+        return SurveyApi.list(page).then((function(data) {
             this.setState({surveys: data});
         }).bind(this));
     }
 
     render() {
-        var surveyList = this.state.surveys.docs.map((d) => {
+        var surveyList = this.state.surveys.docs.map((d,idx) => {
+            if (idx === 0) {
+                return <SurveyEntry data={d} 
+                        key={d.surveyKey} data-step="3" data-intro="Setup your review email campaign here. Your users will fill the reviews from the email they receive from one of these campaigns."/> ;
+            }
+
             return <SurveyEntry data={d} 
-                    key={d.surveyKey}/>
+                    key={d.surveyKey}/> ;
         });
         const { page, limit, docs, total } = this.state.surveys;
         const seenSofar = (page-1) * limit + docs.length;
@@ -70,18 +77,20 @@ var SurveyHeader = (props) => {
                 <div className="App-textMeta">{ props.count } / { props.total } {'Campaigns'} </div>
             </Col>
             <Col span={5}>
-                <Link to="/surveys/new"><Button type="primary" ghost = {true} className="pull-right">Create Campaign</Button></Link>
+                <Link to="/surveys/new"><Button type="primary" ghost = {true} className="pull-right" onClick = { () => window.mixpanel.track('Initiate Campaign') }
+                    data-step="4" data-intro="Let's start off by setting up your first email campaign. Or can simply edit the sample campaign we have provided.">Create Campaign</Button></Link>
             </Col>
         </Row>
     );
 };
 
 var SurveyEntry = (props) => {
-    var surveyData = props.data;
-    surveyData.description = "Need some campaign description";
+    var surveyData = props.data,
+        sampleStyle = {display: 'none'};
+    if (surveyData.sample) sampleStyle = {display:'inline', marginLeft: 15};
     return (
-        <List.Item> 
-            <List.Item.Meta title={ <Link to={ "/surveys/" + surveyData.surveyKey + '/edit'} style={{color:'#1890ff'}}>{ surveyData.title } </Link> } />
+        <List.Item {...props}> 
+            <List.Item.Meta title={ <span><Link to={ "/surveys/" + surveyData.surveyKey + '/edit'} style={{color:'#1890ff'}}>{ surveyData.title } </Link> <span style={sampleStyle} className={'Feedback-displayed'}>( SAMPLE CAMPAIGN )</span></span>} />
             <Row type="flex" justify="space-between" style={{color: 'rgba(28, 46, 61, .4)'}}>
                 <Col span={13} style={{wordWrap: 'break-word'}}>{surveyData.description}</Col>
                 <Col span={8}><span style={{fontSize:11, float:'right'}}>Email | {"Created by " + surveyData.createdBy.name} | {dateformat(surveyData.created, "mmm d, yyyy")}</span></Col>

@@ -71,6 +71,30 @@ class SettingsApi {
         }).then((res) => res.json());
     }
 
+    static getEmailSettings() {
+        return fetch('/api/settings/email', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());
+    }
+ 
+    static saveEmailSettings(spec) {
+        return fetch('/api/settings/email', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(spec)
+        }).then((res) => res.json());
+    }
+
+
 }
 
 export default SettingsApi;

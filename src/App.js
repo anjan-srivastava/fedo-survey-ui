@@ -4,59 +4,101 @@ import SettingsView from './settings';
 import UserApi from './user';
 import FeedbacksView from './feedback';
 import { HashRouter, Route, Switch, Link } from 'react-router-dom';
-import { Layout, Menu, Affix, Select } from 'antd';
-
+import { Layout, Menu, Affix, Select, Alert } from 'antd';
 import fetchIntercept from 'fetch-intercept';
+
+import myintro from './myintro.js';
 
 // styles
 import 'font-awesome/css/font-awesome.min.css';
 import 'antd/dist/antd.css';
+import '../node_modules/intro.js/minified/introjs.min.css';
 import './App.css';
 
 class App extends Component {
-  state = { me: {} }
+  state = { me: {}, rootRoute: '' }
   constructor() {
     super();
     fetchIntercept.register({
         response: function(response) {
             if (response.redirected) {
                 window.location = response.url;
-                // window.location = 'http://localhost:3000/login';
             }
             return response;
         }
     });
+
   }
 
   componentDidMount() {
     UserApi.me().then((function(user) {
-        this.setState(Object.assign({}, this.state, {me: user}));
+        myintro.firstLogin = user.firstLogin;
+        window.mixpanel.identify(user.id);
+
+        let msg;
+        if (user.license.plan === 'BASIC') {
+            let plus30Days = new Date(user.license.started);
+            plus30Days.setDate(plus30Days.getDate() + user.license.limitDays);
+            const remaining =  Math.floor((plus30Days - new Date()) / (24*60*60*1000));
+            
+            if (remaining > 30) {
+                msg = 'Your free trial period is exhausted. In order to continue user Outreech upgrade plan.';
+            } else {
+                msg = 'Your free trial will end in ' + remaining + ' days.';
+            }
+        }
+        this.setState(Object.assign({}, this.state, 
+                    {
+                        me: user, 
+                        freeTrialMessage: msg,
+                        rootRoute: user.firstLogin? (<Route exact path="/" component={ SettingsView } />):
+                                 (<Route exact path="/" component={ FeedbacksView } />)
+                    }));
+
+
+
+        // identify user to Freshchat
+        window.fcWidget.init({
+            token: "f8a997dc-1d8d-40a8-96b9-54357d47fdb4",
+            host: "https://wchat.freshchat.com",
+            externalId: user.id,
+            firstName: user.name,
+            lastName: user.lname,
+            email: user.username
+        });
+
     }).bind(this));
   }
 
   render() {
     return (
-      <div className="App">
+      <div className="App" data-me = { JSON.stringify(this.state.me) } >
         <HashRouter>
             <Layout>
                 <Layout.Header className="App-header">
-                    <Link to="#"><AppLogo className="App-logo" /></Link>
+                { /*<Link to="#"><AppLogo className="App-logo" /></Link> */}
                     <WorkspaceActions user={this.state.me} className="App-userActions" style={{width: 128, marginTop: 15, color: '#fff', marginLeft: 100}}/>
                     <UserActions user={this.state.me} className="pull-right App-userActions" style={{width: 128, marginTop: 15, color: '#fff'}}/>
                 </Layout.Header>
+
+
                 <Layout>
                     <Layout.Sider width={ 165 } style={{backgroundColor: 'rgb(246, 246, 246)'}}>
                         <Affix>
                             <Menu className = "App-sideNav" defaultSelectedKeys= { ["feedbacks"] } >
                                 <Menu.Item key="feedbacks"><Link to="/feedbacks">User Reviews</Link></Menu.Item>
                                 <Menu.Item key="surveys"><Link to="/surveys">Campaigns</Link></Menu.Item>
-                                <Menu.Item key="settings"><Link to="/settings">Settings</Link></Menu.Item>
+                                <Menu.Item key="settings"><Link to="/settings" >Settings</Link></Menu.Item>
                             </Menu>
                         </Affix>         
                     </Layout.Sider>
                     <Layout.Content className="App-body" >
+                    { this.state.freeTrialMessage && (<Alert type="info" message={
+                            this.state.freeTrialMessage 
+                        } banner={true} closable={true} />) }
                         <Switch>
-                            <Route exact path="/" component={ FeedbacksView } />
+
+                            { this.state.rootRoute }
                             <Route exact path="/feedbacks" component={ FeedbacksView } />
                             <Route exact path="/surveys" component={ ListSurvey } />
                             <Route exact path="/surveys/new" component={ CreateCampaignView } />

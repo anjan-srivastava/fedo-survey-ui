@@ -34,7 +34,7 @@
 }
 
 .App-checkedBackground {
-    background-image: url('checks.jpg');
+    background-image: url('checks.jpg') !important;
 }
 
 /* Typography related styles */

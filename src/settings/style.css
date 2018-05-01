@@ -97,6 +97,7 @@
     color: #D8D8D8;
 }
 
+.Email-emailSettingsForm input[type='text'],
 .DesignSettings input[type="text"],
 .Settings input[type="text"] {
     width: 99px;
@@ -115,6 +116,7 @@
     padding: 30px 0;
 }
 
+.WidgetSettings .Email-emailSettingsForm div.ant-form-item,
 .WidgetSettings .Profile-profileForm div.ant-form-item {
     margin: 0 !important;
 }
@@ -132,4 +134,13 @@
     color: #1C2E3D;
     font-size: 14px;
     line-height: 16px;
+}
+
+.Email-emailSettingsForm input[type='text'] {
+    width: 300px;
+}
+
+
+.outreech-colorpicker {
+    margin: 0 10px;
 }

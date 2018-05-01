@@ -20,5 +20,38 @@
     line-height: 14px;
 }
 
+.Feedback-extra-nomargin 
+.ant-list-vertical
+.ant-list-item-extra {
+    margin: 0 !important;
+}
+
+.Feedback-edit-wrap
+.ant-input-suffix {
+    right: 3px !important;
+    top: 55% !important;
+}
+
+.Feedback-name-edit {
+    color: #4A90E2;
+    margin-left: 8px;
+    cursor: pointer;
+    display: none !important;
+}
+.Feedback-name-editbox {
+    width: 99px;
+    height: 30px;
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    color: #1C2E3D;
+    font-size: 14px;
+    line-height: 16px;
+}
+
+.ant-list-item:hover
+.Feedback-name-edit {
+    display: inline-block !important;
+}
+
 .Feedback-contentText {
 }
