@@ -11,6 +11,18 @@ class SurveyApi {
             }
         }).then((res) => res.json());
    }
+   
+   static listAll () {
+        return fetch('/api/surveys/query', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());
+   }
+
 
    static getSurvey(surveyKey) {
        return fetch('/api/surveys/' + surveyKey, {

@@ -23,6 +23,18 @@ class SettingsApi {
             }
         }).then((res)=>res.json());
     }
+    
+    static getCarouselConfig() {
+        return fetch('/api/settings/carousel', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res)=>res.json());
+    }
+
 
     static saveWidgetConfig(config) {
         return fetch('/api/settings/widget', {
@@ -35,6 +47,19 @@ class SettingsApi {
             body: JSON.stringify(config)
         }).then((res)=>res.json());
     }
+    
+    static saveCarouselConfig(config) {
+        return fetch('/api/settings/carousel', {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(config)
+        }).then((res)=>res.json());
+    }
+
 
     static restoreWidgetDefaults() {
         return fetch('/api/settings/widget/reset', {
@@ -46,6 +71,18 @@ class SettingsApi {
             }
         }).then((res) => res.json());
     }
+    
+    static restoreCarouselDefaults() {
+        return fetch('/api/settings/carousel/reset', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then((res) => res.json());
+    }
+
 
 
     static getProfileSettings() {
