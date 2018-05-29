@@ -20,7 +20,7 @@ class Rating extends Component {
         return (
             <form name="feedbackForm" id="feedbackForm"
                 action="#" method="POST">
-                <div className="rating theme-default" style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row'}}>
+                <div className="rating theme-default" >
                     <h4>Rate the feature</h4>
                     <Radio.Group style = {{marginBottom: 40}}>
                         {stars}

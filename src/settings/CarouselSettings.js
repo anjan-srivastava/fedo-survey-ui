@@ -4,6 +4,7 @@ import { Layout, Form, Button, Select, Spin, Switch, Radio, InputNumber, Input, 
 import ColorPicker from '../colorpicker';
 import SettingsApi from './SettingsApi.js';
 import SurveyApi from '../survey/SurveyApi.js';
+import CarouselPreview from './CarouselPreview.js';
 
 import myintro from '../myintro.js';
 
@@ -19,12 +20,18 @@ class CarouselSettings extends Component {
             settings: {
                 enabled: true,
                 scrollEnabled: false,
+                titleEnabled: true,
+                titleText: 'What our cutomers say about us!',
+                avgRatingEnabled: true,
                 showReviewerName: true,
-                showReviewDate: true,
+                //showReviewDate: true,
                 maxReviews: 3
             },
             design: {
                 backgroundColorOpen: '#ffffff',
+                backgroundColorCarousel: '#550078',
+                titleFontColor: '#495864',
+                nameFontColor: '#000000',
                 fontColor: '#333333',
                 ratingIconColor: '#ffc719',
             }
@@ -171,12 +178,23 @@ class CarouselSettings extends Component {
                                 <Form.Item {...formItemLayout} label="Automatically scroll reviews" >
                                     <FedoSwitch isOn = { this.state.config.settings.scrollEnabled } onChange = { this.getConfigHandlerFor('settings.scrollEnabled') }/>
                                 </Form.Item>
+                                <Form.Item {...formItemLayout} label="Display widget title" >
+                                    <FedoSwitch isOn = { this.state.config.settings.titleEnabled } onChange = { this.getConfigHandlerFor('settings.titleEnabled') }/>
+                                </Form.Item>
+                                <Form.Item {...formItemLayout} label="Widget title text" >
+                                    <Input style={{width: 300}} value = { this.state.config.settings.titleText } onChange = { this.getConfigHandlerFor('settings.titleText') }/>
+                                </Form.Item>
+                                <Form.Item {...formItemLayout} label="Display average rating" >
+                                    <FedoSwitch isOn = { this.state.config.settings.avgRatingEnabled } onChange = { this.getConfigHandlerFor('settings.avgRatingEnabled') }/>
+                                </Form.Item>
                                 <Form.Item {...formItemLayout} label="Display reviewer name" >
                                     <FedoSwitch isOn = { this.state.config.settings.showReviewerName } onChange = { this.getConfigHandlerFor('settings.showReviewerName') }/>
                                 </Form.Item>
-                                <Form.Item {...formItemLayout} label="Show review date" >
+                                {/* 
+                                    <Form.Item {...formItemLayout} label="Show review date" >
                                     <FedoSwitch isOn = { this.state.config.settings.showReviewDate } onChange = { this.getConfigHandlerFor('settings.showReviewDate') }/>
                                 </Form.Item>
+                                */}
                                 <Form.Item {...formItemLayout} label="Limit number of reviews to" >
                                     <InputNumber min={1} max={this.state.config.licenseReviewLimit} value = { Math.min(this.state.config.settings.maxReviews, this.state.config.licenseReviewLimit) } 
                                         onChange = { this.getConfigHandlerFor('settings.maxReviews') }/>
@@ -193,18 +211,28 @@ class CarouselSettings extends Component {
                      
                                      
                  </Layout.Content>
-                {/* 
-                <Layout.Sider width= { 400 } style={{background: '#fff'}}>
+                 
+                <Layout.Sider width= { 450 } style={{background: '#fff'}}>
                     <Affix style={{background: '#fff'}}>
                         <div style = {{ height: '100vh', padding: 16  }} 
                                         className="Feedback-Sider-Right App-checkedBackground" 
-                            id={ "outreech-widget-container" }>
-
-                            
+                            id={ "outreech-carousel-container" }>
+                           <CarouselPreview style={{ marginTop: 164 }}
+                                showReviewerName = { this.state.config.settings.showReviewerName }
+                                titleEnabled = { this.state.config.settings.titleEnabled }
+                                titleText = { this.state.config.settings.titleText }
+                                avgRatingEnabled = { this.state.config.settings.avgRatingEnabled } 
+                                backgroundColorOpen = { this.state.config.design.backgroundColorOpen }
+                                backgroundColorCarousel = { this.state.config.design.backgroundColorCarousel }
+                                titleFontColor = { this.state.config.design.titleFontColor }
+                                nameFontColor = { this.state.config.design.nameFontColor }
+                                fontColor = { this.state.config.design.fontColor }
+                                ratingIconColor = { this.state.config.design.ratingIconColor }
+                                /> 
                         </div>
                     </Affix>
                 </Layout.Sider>
-                */}
+                
              </Layout>   
              <Layout.Footer className={'CreateCampaign-Footer'} style={{position:'relative'}}>
                 <div style={{width: '89%'}}>
@@ -279,7 +307,7 @@ class DesignForm extends Component {
         const { getFieldDecorator } = this.props.form;
         return (
             <Form onSubmit = { this.handleFormSubmission.bind(this) } >
-                <Form.Item {...formItemLayout} label="Background color for open state" id='design_backgroundColorOpen'>
+                <Form.Item {...formItemLayout} label="Carousel Card Color" id='design_backgroundColorOpen'>
                     { getFieldDecorator('design_backgroundColorOpen', { initialValue: this.props.parentState.config.design.backgroundColorOpen, 
                                                    rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
                         <Input onChange = { this.props.getConfigHandlerFor('design.backgroundColorOpen') } />
@@ -289,8 +317,39 @@ class DesignForm extends Component {
                         (color) => this.props.getConfigHandlerFor('design.backgroundColorOpen')(color.hex)
                     }/>
                 </Form.Item>
-                                
+                
+                <Form.Item {...formItemLayout} label="Carousel Background Color" id='design_backgroundColorCarousel'>
+                    { getFieldDecorator('design_backgroundColorCarousel', { initialValue: this.props.parentState.config.design.backgroundColorCarousel, 
+                                                   rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
+                        <Input onChange = { this.props.getConfigHandlerFor('design.backgroundColorCarousel') } />
+                    )}
 
+                    <ColorPicker color={ this.props.parentState.config.design.backgroundColorCarousel } onChange = {
+                        (color) => this.props.getConfigHandlerFor('design.backgroundColorCarousel')(color.hex)
+                    }/>
+                </Form.Item>
+
+                                
+                <Form.Item {...formItemLayout} label="Title font color" id='design_titleFontColor'>
+                    { getFieldDecorator('design_titleFontColor', { initialValue: this.props.parentState.config.design.titleFontColor,
+                                                   rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
+                        <Input onChange = { this.props.getConfigHandlerFor('design.titleFontColor') } />
+                    )}
+                    <ColorPicker key={'backgroundColorOpen'} color={ this.props.parentState.config.design.titleFontColor } onChange = {
+                        (color) => this.props.getConfigHandlerFor('design.titleFontColor')(color.hex)
+                    }/>
+
+                </Form.Item>
+
+                <Form.Item {...formItemLayout} label="Reviewer name font color" id='design_nameFontColor'>
+                    { getFieldDecorator('design_nameFontColor', { initialValue: this.props.parentState.config.design.nameFontColor,
+                                                   rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
+                        <Input onChange = { this.props.getConfigHandlerFor('design.nameFontColor') } />
+                    )}
+                    <ColorPicker key={'nameFontColor'} color={ this.props.parentState.config.design.nameFontColor } onChange = {
+                        (color) => this.props.getConfigHandlerFor('design.nameFontColor')(color.hex)
+                    }/>
+                </Form.Item>
                 <Form.Item {...formItemLayout} label="Font color" id='design_fontColor'>
                     { getFieldDecorator('design_fontColor', { initialValue: this.props.parentState.config.design.fontColor, 
                                                    rules: [{pattern: RGBREGEX, message: 'Only #rrggbb format is allowed.' }]})(
@@ -320,3 +379,5 @@ class DesignForm extends Component {
 let DecoratedDesignForm = Form.create({})(DesignForm);
 export default CarouselSettings;
                             
+ 
+

@@ -170,7 +170,7 @@ class WidgetSettings extends Component {
                                         className="Feedback-Sider-Right App-checkedBackground" 
                             id={ "outreech-widget-container" }>
 
-                            <WidgetPreview style={{ margin: '144px 24px 24px 24px' }} 
+                            <WidgetPreview style={{ margin: '164px 24px 24px 24px' }} 
                                 showReviewerName = { this.state.config.settings.showReviewerName }
                                 showReviewDate = { this.state.config.settings.showReviewDate }
                                 titleText = { this.state.config.settings.titleText }
