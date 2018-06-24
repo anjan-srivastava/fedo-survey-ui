@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { CreateCampaignView, ListSurvey } from './survey';
+import { CreateCampaignView, ListSurvey, ListAutomaticEmails } from './survey';
 import SettingsView from './settings';
+import { RegularSite, Shopify } from './integration';
 import UserApi from './user';
 import FeedbacksView from './feedback';
 import { HashRouter, Route, Switch, Link } from 'react-router-dom';
@@ -87,7 +88,14 @@ class App extends Component {
                         <Affix>
                             <Menu className = "App-sideNav" defaultSelectedKeys= { ["feedbacks"] } >
                                 <Menu.Item key="feedbacks"><Link to="/feedbacks">User Reviews</Link></Menu.Item>
-                                <Menu.Item key="surveys"><Link to="/surveys">Campaigns</Link></Menu.Item>
+                                <Menu.SubMenu title="Curate Content">
+                                    <Menu.Item key="autosurveys"><Link to="/autosurveys">Automated Emails</Link></Menu.Item>
+                                    <Menu.Item key="surveys"><Link to="/surveys">Manual Email Campaigns</Link></Menu.Item>
+                                </Menu.SubMenu>
+                                <Menu.SubMenu title="Integrations">
+                                    <Menu.Item key="regularsite"><Link to="/integrations/regular">Regular Site</Link></Menu.Item>
+                                    <Menu.Item key="shopify"><Link to="/integrations/shopify">Shopify</Link></Menu.Item>
+                                </Menu.SubMenu>
                                 <Menu.Item key="settings"><Link to="/settings" >Settings</Link></Menu.Item>
                             </Menu>
                         </Affix>         
@@ -101,8 +109,11 @@ class App extends Component {
                             { this.state.rootRoute }
                             <Route exact path="/feedbacks" component={ FeedbacksView } />
                             <Route exact path="/surveys" component={ ListSurvey } />
+                            <Route exact path="/autosurveys" component={ ListAutomaticEmails } />
                             <Route exact path="/surveys/new" component={ CreateCampaignView } />
                             <Route exact path="/surveys/:surveyKey/edit" component={ CreateCampaignView } />
+                            <Route exact path="/integrations/regular" component={ RegularSite } />
+                            <Route exact path="/integrations/shopify" component={ Shopify } />
                             <Route exact path="/settings" component={ SettingsView } />
                         </Switch>
                     </Layout.Content>

@@ -1,8 +1,8 @@
 import React from 'react';
 
 class SurveyApi {
-   static list (page) {
-        return fetch('/api/surveys/?page=' + page, {
+   static list (page, type='REGULAR') {
+        return fetch(`/api/surveys/?page=${page}&type=${type}`, {
             method: 'GET',
             credentials: 'include',
             headers: {

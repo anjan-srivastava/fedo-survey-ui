@@ -8,21 +8,30 @@ import SurveyApi from './SurveyApi.js';
 import './style.css';
 
 const addRecepientStateStorageKey = 'AddRecepientContentState';
+const CTYPE_INTEGRATION = 'INTEGRATION';
 
 class CreateCampaignView extends Component {
   surveyData = { }
-  componentDidMount() {
+  componentWillMount() {
       if (this.props.match.params.surveyKey) {
           SurveyApi.getSurvey(this.props.match.params.surveyKey).then((function(data) {
             this.surveyData = data;
             this.setState(Object.assign({}, this.state, 
                         { contentView: (<AddRecepients.Content key={ this.props.match.params.surveyKey } 
                                 onContinue = { this.continueToEmail.bind(this) } 
-                                recepients={ data.recepients } />)}))
+                                recepients={ data.recepients } />)}));
+
+            if (this.isAutomatedSurvey()) {
+              document.getElementById('id_recepientsFormContinue').click();
+            }
+
           }).bind(this));  
       }
   }
 
+  isAutomatedSurvey() {
+    return this.surveyData.type && this.surveyData.type.indexOf(CTYPE_INTEGRATION) != -1;
+  }
 
   addRecepientsContentView = (<AddRecepients.Content  onContinue = { this.continueToEmail.bind(this) } />);
   addRecepientsFooterView = (<AddRecepients.Footer  />);
@@ -52,15 +61,28 @@ class CreateCampaignView extends Component {
   }
 
   render() {
+    const header = !this.isAutomatedSurvey()?(
+        <Breadcrumb separator=">" style={{fontSize: '12px'}}>
+            <Breadcrumb.Item><a href="#" onClick={this.handleBreadcrumbClick.bind(this)}>Add Recepients</a></Breadcrumb.Item>
+            <Breadcrumb.Item>Create Email</Breadcrumb.Item>
+        </Breadcrumb>
+      ):(
+        <span style={{
+          fontSize: 12,
+          fontWeight: 500,
+          lineHeight: '14px',
+          color: 'rgba(28,46,61,0.8)'
+        }}>
+          Automated Post Purchase Emails
+        </span>
+      );
+
     return (
         <Layout style ={{background: '#fff'}}>
         
             <Row style={{borderBottom: 'solid 1px #e3e5e6', padding: '14px 24px'}}>
                 <Col span={24}>
-                    <Breadcrumb separator=">" style={{fontSize: '12px'}}>
-                        <Breadcrumb.Item><a href="#" onClick={this.handleBreadcrumbClick.bind(this)}>Add Recepients</a></Breadcrumb.Item>
-                        <Breadcrumb.Item>Create Email</Breadcrumb.Item>
-                    </Breadcrumb>
+                    { header }
                 </Col>
             </Row> 
             <Layout.Content style={{marginBottom: 55}}>
@@ -77,7 +99,7 @@ class CreateCampaignView extends Component {
     this.setState({contentView: (<CreateEmail.Content 
                                     survey = { this.surveyData }
                                     recepients={ recepients }
-                                    surveyKey={ this.props.match.params.surveyKey } />), footerView: (<CreateEmail.Footer />)});    
+                                    surveyKey={ this.props.match.params.surveyKey } />), footerView: (<CreateEmail.Footer survey={ this.surveyData }/>)});    
   }
 }
 
@@ -186,7 +208,7 @@ class AddRecepientContent extends Component {
 var AddRecepients = {
     Footer: (props) => {
         return (
-            <Button type="primary" style={{width: 100}} onClick={ ()=>{document.getElementById('id_recepientsFormSubmitBtn').click();} }>Continue</Button>
+            <Button id="id_recepientsFormContinue" type="primary" style={{width: 100}} onClick={ ()=>{document.getElementById('id_recepientsFormSubmitBtn').click();} }>Continue</Button>
         ); 
     }
 };

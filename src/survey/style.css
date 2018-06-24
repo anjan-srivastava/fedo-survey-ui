@@ -29,6 +29,10 @@
     padding: 36px 24px;
 }
 
+.CreateCampaign-Section.smallpad {
+    padding: 24px;
+}
+
 .CreateCampaign-mailPreview .section.signature {
     min-height: 100px;
 }

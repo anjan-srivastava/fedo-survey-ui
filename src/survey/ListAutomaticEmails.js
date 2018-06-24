@@ -9,7 +9,7 @@ import myintro from '../myintro.js';
 // styles
 import './ListSurvey.css';
 
-class ListSurvey extends Component {
+class ListAutomaticEmails extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -22,7 +22,7 @@ class ListSurvey extends Component {
     }
 
     paginate(page, pageSize) {
-        return SurveyApi.list(page).then((function(data) {
+        return SurveyApi.list(page, 'INTEGRATION').then((function(data) {
             this.setState({surveys: data});
         }).bind(this));
     }
@@ -72,14 +72,14 @@ var SurveyHeader = (props) => {
     return (
         <Row type="flex" justify="space-between" style={{ padding: '32px', border: 'solid 1px #ececec' }}>
             <Col span={18}>
-                <h2>Email Campaigns</h2>
+                <h2>Automated Emails</h2>
                 <div className="App-textMeta">You can set new email campaign from here. Send mails to specific users or in masses. All the user replies to these emails can be accessed in the Reviews section.</div>
                 <div className="App-textMeta">{ props.count } / { props.total } {'Campaigns'} </div>
             </Col>
-            <Col span={5}>
+            {/*<Col span={5}>
                 <Link to="/surveys/new"><Button type="primary" ghost = {true} className="pull-right" onClick = { () => window.mixpanel.track('Initiate Campaign') }
                     data-step="4" data-intro="Let's start off by setting up your first email campaign. Or can simply edit the sample campaign we have provided.">Create Campaign</Button></Link>
-            </Col>
+            </Col>*/}
         </Row>
     );
 };
@@ -99,5 +99,5 @@ var SurveyEntry = (props) => {
     );
 };
 
-export default ListSurvey;
+export default ListAutomaticEmails;
 

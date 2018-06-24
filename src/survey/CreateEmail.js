@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Row, Col, Radio, Tag, Icon, Input, Modal, notification} from 'antd';
+import { InputNumber, Form, Switch, Button, Row, Col, Radio, Tag, Icon, Input, Modal, notification} from 'antd';
 import Editor from 'react-medium-editor';
 import Rating from '../rating';
 import EditableTagGroup from '../editableTagGroup';
@@ -7,6 +7,8 @@ import SurveyApi from './SurveyApi.js';
 
 import 'medium-editor/dist/css/medium-editor.css';
 import 'medium-editor/dist/css/themes/default.css';
+
+const CTYPE_INTEGRATION = 'INTEGRATION';
 
 class Content extends Component {
 
@@ -35,13 +37,19 @@ class Content extends Component {
                     case 'id_emailSign': update['signaturePlaceHolder'] = '';
                                          update['signatureData'] = value;
                                          break;
+                   
                }
-
-               setTimeout((function() {
-                this.setState(Object.assign({}, this.state, update));
-               }).bind(this),0);
             }
         }
+        
+        setTimeout((function() {
+        this.setState(Object.assign({}, this.state, update));
+        }).bind(this),0);
+    }
+
+    isAutomatedSurvey() {
+        return this.props.survey && this.props.survey.type &&
+            this.props.survey.type.indexOf(CTYPE_INTEGRATION) != -1;
     }
 
     defaultSubject = "Help us improve with your feedback!";
@@ -95,7 +103,12 @@ class Content extends Component {
                         cta: formData.id_emailCTA || 'Send us your feedback',
                         signature: formData.id_emailSign,
                         description: formData.id_campaignDesc,
-                        saveOnly: saveOnly
+                        saveOnly: saveOnly,
+                        // present only in case of automated mails
+                        config: {
+                            mailActivation: formData.id_mailActivation,
+                            mailAfterDays: formData.id_mailAfterDays
+                        }
 
                     }, surveyKey)
                     .then((resp) => { if( resp.ok) return resp; throw { status: resp.status, msg: resp.text() }})
@@ -176,13 +189,58 @@ class Content extends Component {
     
     render() {
         const { getFieldDecorator } = this.props.form;
-        let { title, tags, subject, mailBody, cta, signature, description } = this.props.survey;
+        let { title, tags, subject, mailBody, cta, signature, description, config } = this.props.survey;
+        config = config || {};
+
         subject = subject ? subject: this.defaultSubject;
         mailBody = mailBody ? mailBody: this.defaultMailBody;
+
+        const automatedMailConfig = this.isAutomatedSurvey()?(
+            <div>
+                <Row className="CreateCampaign-Section smallpad">
+                    <Form.Item >
+                        <h3 style={{display: 'inline-block'}} id="id_mailActivation">Mail after Purchase </h3>
+                        <span 
+                            className="App-textMeta"
+                            style={{margin: '0 10px'}}>
+                                { this.props.form.getFieldValue('id_mailActivation')?'(ACTIVE)': '(DEACTIVE)' }
+                        </span>
+                        { getFieldDecorator('id_mailActivation', { initialValue: config.mailActivation, valuePropName: 'checked' })
+                            (
+                                <Switch style={{float: 'right'}}/>
+                            ) 
+                        }
+                        <div className = "App-textMeta">Activate to begin sending mail after purchase emails.</div>
+                    </Form.Item>
+                </Row>
+
+                <Row className="CreateCampaign-Section ">
+                    <Form.Item >
+                        <h3 style={{display: 'inline-block'}} id="id_mailAfterDays">Send mail after </h3>
+                        { getFieldDecorator('id_mailAfterDays', {initialValue: config.mailAfterDays, 
+                                rules:[ { validator: ((r, v, c)=>{
+                                    if (this.props.form.getFieldValue('id_mailActivation') && !v) {
+                                        c('This field is mandatory');
+                                    }
+                                    c();
+                                }).bind(this)}] })
+                            (
+                                <InputNumber min={1} max={15} 
+                                    style={{margin: '0 25px'}}/>  
+                            ) 
+                        }
+                        <h3 style={{display: 'inline-block'}} id="id_mailActivationRest">days of purchase </h3>
+                    </Form.Item>
+                </Row>
+            </div>
+        ):(null);
+
         return (
             <Row type="flex">
                 <Col span={12}>
                     <Form id="id_formCreateCampaign" onSubmit = { this.handleFormSubmission.bind(this) } >
+                        { automatedMailConfig }
+
                         <Row className="CreateCampaign-Section">
                             <Form.Item>
                                 <h3 id="id_campaignName">Name of this email campaign*</h3>
@@ -347,10 +405,15 @@ class Footer extends Component {
     saveSurvey() {
         const campaignFormSubmitButton = document.getElementById('id_formCreateCampaignSubmit');
         const requestInProg = campaignFormSubmitButton.hasAttribute('data-saveonly');
-        if (requestInProg) return; // save request already in process
+        //if (requestInProg) return; // save request already in process
 
         campaignFormSubmitButton.setAttribute('data-saveonly', 'true');
         campaignFormSubmitButton.click(); 
+    }
+
+    isAutomatedSurvey() {
+        return this.props.survey && this.props.survey.type &&
+            this.props.survey.type.indexOf(CTYPE_INTEGRATION) != -1;
     }
 
     sendTest() {
@@ -406,12 +469,13 @@ class Footer extends Component {
         }).bind(this));
     }
 
+
     render() {
         const { getFieldDecorator } = this.props.form;
         return (<div style={{width: '89%'}}>
-                    <Button type="primary" style={{width: 100, marginRight: 20}} onClick={ this.sendSurvey }>Send Now</Button>
+                    <Button type="primary" style={{width: 100, marginRight: 20, display: this.isAutomatedSurvey()?'none':'inline'}} onClick={ this.sendSurvey }>Send Now</Button>
                     <Button  style={{width: 100, fontSize: '11px', color: '#aaa'}} onClick={ this.sendTest.bind(this) } >Send Test</Button>
-                    <Button type="primary" style={{width: 100, margin: '0 20px'}} className="pull-right" onClick={ this.saveSurvey.bind(this) }>Save</Button>
+                    <Button type="primary" style={{width: 100, marginRight: 20}} className={this.isAutomatedSurvey()?"pull-left": "pull-right"} onClick={ this.saveSurvey.bind(this) }>Save</Button>
                     <Modal title="Send Test"
                         okText="Send"
                         visible={ this.state.sendTestModalVisible }
